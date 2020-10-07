@@ -9,14 +9,16 @@ import testinfra.utils.ansible_runner
 from tests.utils import KafkaManager
 
 
-testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
-    os.environ['MOLECULE_INVENTORY_FILE']).get_hosts(['kafka1*', 'kafka2*'])
+runner = testinfra.utils.ansible_runner.AnsibleRunner(
+    os.environ['MOLECULE_INVENTORY_FILE'])
+testinfra_hosts = runner.get_hosts('kafka')
 localhost = testinfra.get_host(
     'localhost',
     connection='ansible',
     ansible_inventory=os.environ['MOLECULE_INVENTORY_FILE']
 )
-localhost_vars = localhost.ansible.get_variables()
+localhost_facts = runner.run_module('localhost', 'debug',
+                                    'var=ansible_facts')['ansible_facts']
 
 
 def test_configured_topic(host):
@@ -24,9 +26,11 @@ def test_configured_topic(host):
     Test if topic configuration is what was defined
     """
     ansible_vars = host.ansible.get_variables()
-    topic_configuration = localhost_vars['topic_defaut_configuration']
-    topic_name = localhost_vars['topic_name']
-    kafka_servers = ansible_vars['ansible_eth0']['ipv4']['address']+':9092'
+    topic_configuration = localhost_facts['topic_defaut_configuration']
+    topic_name = localhost_facts['topic_name']
+    kafka_servers = \
+        ansible_vars['ansible_eth0']['ipv4']['address']['__ansible_unsafe']\
+        + ':9092'
 
     # Forcing api_version to 0.11.0 in order to be sure that a
     # Metadata_v1 is sent (so that we get the controller info)
@@ -60,8 +64,10 @@ def test_configured_acl(host):
     Test if acl configuration is what was defined
     """
     ansible_vars = host.ansible.get_variables()
-    acl_configuration = localhost_vars['acl_defaut_configuration']
-    kafka_servers = ansible_vars['ansible_eth0']['ipv4']['address']+':9094'
+    acl_configuration = localhost_facts['acl_defaut_configuration']
+    kafka_servers = \
+        ansible_vars['ansible_eth0']['ipv4']['address']['__ansible_unsafe']\
+        + ':9094'
 
     # Forcing api_version to 0.11.0 in order to be sure that a
     # Metadata_v1 is sent (so that we get the controller info)

@@ -3,11 +3,15 @@ dependency:
   name: galaxy
 driver:
   name: docker
-lint:
-  name: yamllint
+lint: |
+  yamllint .
+  ansible-lint
+  flake8
 platforms:
   # 0.11.0.3
   - name: zookeeper-01103
+    groups:
+      - zookeeper
     image: zookeeper:3.4
     command: "bin/zkServer.sh start-foreground"
     published_ports:
@@ -17,6 +21,8 @@ platforms:
         aliases:
           - zookeeper-01103
   - name: kafka1-01103
+    groups:
+      - kafka
     image: wurstmeister/kafka:2.11-0.11.0.3
     command: "start-kafka.sh"
     env:
@@ -42,6 +48,8 @@ platforms:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./kafka_server_jaas.conf:/opt/kafka/jaas/kafka_server_jaas.conf
   - name: kafka2-01103
+    groups:
+      - kafka
     image: wurstmeister/kafka:2.11-0.11.0.3
     command: "start-kafka.sh"
     env:
@@ -68,6 +76,8 @@ platforms:
       - ./kafka_server_jaas.conf:/opt/kafka/jaas/kafka_server_jaas.conf
   # 1.1.1
   - name: zookeeper-111
+    groups:
+      - zookeeper
     image: zookeeper:3.4
     command: "bin/zkServer.sh start-foreground"
     published_ports:
@@ -102,6 +112,8 @@ platforms:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./kafka_server_jaas.conf:/opt/kafka/jaas/kafka_server_jaas.conf
   - name: kafka2-111
+    groups:
+      - kafka
     image: wurstmeister/kafka:2.11-1.1.1
     command: "start-kafka.sh"
     env:
@@ -128,6 +140,8 @@ platforms:
       - ./kafka_server_jaas.conf:/opt/kafka/jaas/kafka_server_jaas.conf
   # 2.5.0
   - name: zookeeper-250
+    groups:
+      - zookeeper
     image: zookeeper:3.4
     command: "bin/zkServer.sh start-foreground"
     published_ports:
@@ -137,6 +151,8 @@ platforms:
         aliases:
           - zookeeper-250
   - name: kafka1-250
+    groups:
+      - kafka
     image: wurstmeister/kafka:2.12-2.5.0
     command: "start-kafka.sh"
     env:
@@ -162,6 +178,8 @@ platforms:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./kafka_server_jaas.conf:/opt/kafka/jaas/kafka_server_jaas.conf
   - name: kafka2-250
+    groups:
+      - kafka
     image: wurstmeister/kafka:2.12-2.5.0
     command: "start-kafka.sh"
     env:
@@ -192,8 +210,6 @@ provisioner:
     defaults:
       fact_caching: jsonfile
       fact_caching_connection: ./ansible_cache
-  lint:
-    name: ansible-lint
   inventory:
     group_vars:
       all:
@@ -231,5 +247,3 @@ verifier:
   options:
     s: true
     l: true
-  lint:
-    name: flake8

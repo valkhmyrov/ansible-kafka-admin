@@ -1,6 +1,7 @@
-ansible==2.7.16
+ansible==2.10.1
+ansible-lint==4.2.0
 funcsigs
-molecule==2.20.1
-testinfra==1.19.0
-docker-py
+molecule==3.0.8
+testinfra==5.3.1
+docker-py==1.10.6
 flake8

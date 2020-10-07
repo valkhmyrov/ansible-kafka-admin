@@ -3,9 +3,6 @@
   hosts: localhost
   connection: local
   gather_facts: false
-  vars:
-    molecule_file: "{{ lookup('env', 'MOLECULE_FILE') }}"
-    molecule_yml: "{{ lookup('file', molecule_file) | molecule_from_yaml }}"
   tasks:
     - name: Destroy molecule instance(s)
       docker_container:
@@ -27,6 +24,6 @@
 
     - name: Delete docker network(s)
       docker_network:
-        name: "{{ item }}"
+        name: "{{ item.name }}"
         state: absent
-      with_items: "{{ molecule_yml.platforms | molecule_get_docker_networks }}"
+      with_items: "{{ molecule_yml.platforms | molecule_get_docker_networks('absent') }}"
