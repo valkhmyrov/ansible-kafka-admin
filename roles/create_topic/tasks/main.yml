@@ -1,0 +1,4 @@
+---
+
+# Prerequisites
+- include_tasks: create_topic.yml

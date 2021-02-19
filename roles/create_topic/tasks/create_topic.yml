@@ -1,0 +1,28 @@
+---
+
+- name: Creating list of zookeepers hosts
+  set_fact:
+    zookeeper_hosts: "{{ (zookeeper_hosts | default([]) ) | union([item ~ ':2181']) }}"
+  loop: "{{ groups['zookeeper'] }}"
+
+- name: Creating list of kafka hosts
+  set_fact:
+    kafka_hosts: "{{ (kafka_hosts | default([]) ) | union([item ~ ':9092']) }}"
+  loop: "{{ groups['kafka'] }}"
+
+- debug:
+    var: zookeeper_hosts, kafka_hosts
+
+- name: Creating topic
+  kafka_topic:
+    api_version: "1.0.1"
+    name: "{{ topic_name }}"
+    partitions: "{{ partitions_number }}"
+    replica_factor: "{{ replication_factor }}"
+    options:
+      cleanup.policy: "{{ cleanup_policy }}"
+      retention.ms: "{{ retention_ms }}"
+      min.insync.replicas: "{{ min_insync_replicas }}"
+    state: "present"
+    zookeeper: "{{ zookeeper_hosts | join(',') }}"
+    bootstrap_servers: "{{ kafka_hosts | join(',') }}"
