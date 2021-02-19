@@ -18,7 +18,7 @@ ansible-playbook -i inventory create_topic.yml --extra-vars '{"topic_name": "tes
 ```
 [root@kafka_3 ~]#echo "Helo World" | /app/kafka/bin/kafka-console-producer.sh --topic test --broker-list kafka_1:9092,kafka_2:9092,kafka_3:9092 
 ```
-На другой ноде:
+На другой ноде должны прочитать что отправили:
 ```
 [root@kafka_1 ~]# /app/kafka/bin/kafka-console-consumer.sh --topic test --bootstrap-server kafka_1:9092,kafka_2:9092,kafka_3:9092 --from-beginning
 Helo World
